@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace Hirsipuu_peli
 {
@@ -6,7 +9,15 @@ namespace Hirsipuu_peli
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            string arvattavaSana = Utils.ArvotaanSana();
+            StringBuilder näytetäänPelaajalle = new StringBuilder(arvattavaSana.Length);
+            for (int i = 0; i < arvattavaSana.Length; i++)
+            {
+                näytetäänPelaajalle.Append("-");
+            }
+
+            Console.WriteLine(näytetäänPelaajalle);
+            Console.WriteLine(arvattavaSana);
         }
     }
 }
