@@ -11,6 +11,7 @@ namespace Hirsipuu_peli
             string näytetäänPelaajalle = Utils.MuutaSana(arvattavaSana);
             bool voitto = false;
             int arvauskerrat = 10;
+            string syöte = null;
             List<char> oikeatVastaukset = new List<char>();
             List<char> väärätVastaukset = new List<char>();
 
@@ -21,40 +22,110 @@ namespace Hirsipuu_peli
             {
                 Console.WriteLine("Sinulla on mahdollisuus arvata väärin " + arvauskerrat + " kertaa.");
                 Console.Write("\nArvattava sana on: " + näytetäänPelaajalle + " (sana on " + arvattavaSana.Length + " kirjainta pitkä) \nArvaa: ");
-                string syöte = Console.ReadLine().ToUpper();
+                try
+                {
+                    syöte = Console.ReadLine().ToUpper();
+                }
+                catch (OutOfMemoryException ex)
+                {
+                    Console.WriteLine("Muisti ei riitä: " + ex.Message);
+                }
                 if (syöte.Length == arvattavaSana.Length)
                 {
                     if (syöte == arvattavaSana)
                     {
                         voitto = true;
                     }
+                    else if (!Utils.VainKirjaimia(syöte)) // tästä ei rangaista, koska pelaaja voi kirjoittaa kirjoitusvirheen.
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Kirjoitit " + syöte);
+                        Console.WriteLine("Tästä vastauksesta ei rangaista.\nKäytä vain kirjaimia, sillä vastaus ei saa sisältää erikoismerkkejä tai numeroita.\nYritä uudestaan.");
+                        Console.WriteLine("Olet yrittänyt seuraavia vääriä kirjaimia: " + Utils.tulostaVäärät(väärätVastaukset));
+                        continue;
+                    }
                     else
                     {
                         Console.Clear();
-                        Console.WriteLine("Vastaus on väärä!");
+                        Console.WriteLine("Vastaus " + syöte + " on väärä!");
+                        Console.WriteLine("Olet yrittänyt seuraavia vääriä kirjaimia: " + Utils.tulostaVäärät(väärätVastaukset));
                         arvauskerrat--;
+                        continue;
+                    }
+                }
+                else if (syöte.Length > 1 && syöte.Length < arvattavaSana.Length) // näistä ei rangaista, koska pelaaja voi kirjoittaa vahingossa liian lyhyen vastauksen.
+                {
+                    if (!Utils.VainKirjaimia(syöte))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Kirjoitit " + syöte);
+                        Console.WriteLine("Tästä vastauksesta ei rangaista.\nKäytä vain kirjaimia, sillä vastaus ei saa sisältää erikoismerkkejä tai numeroita.\nYritä uudestaan.");
+                        Console.WriteLine("Olet yrittänyt seuraavia vääriä kirjaimia: " + Utils.tulostaVäärät(väärätVastaukset));
+                        continue;
+                    }
+                    else if (Utils.VainKirjaimia(syöte))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Kirjoitit " + syöte);
+                        Console.WriteLine("Tästä vastauksesta ei rangaista, sillä vastauksessa ei ole tarvittava määrä kirjaimia.\nYritä uudestaan.");
+                        Console.WriteLine("Olet yrittänyt seuraavia vääriä kirjaimia: " + Utils.tulostaVäärät(väärätVastaukset));
+                        continue;
+                    }
+                }
+                else if (syöte.Length > arvattavaSana.Length) // näistä ei rangaista, koska pelaaja voi kirjoittaa vahingossa liian pitkän vastauksen.
+                {
+                    if (!Utils.VainKirjaimia(syöte))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Kirjoitit " + syöte);
+                        Console.WriteLine("Tästä vastauksesta ei rangaista, sillä se on liian pitkä ja se sisältää erikoismerkkejä/numeroita.\nYritä uudestaan.");
+                        Console.WriteLine("Olet yrittänyt seuraavia vääriä kirjaimia: " + Utils.tulostaVäärät(väärätVastaukset));
+                        continue;
+                    }
+                    else if (Utils.VainKirjaimia(syöte))
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Kirjoitit " + syöte);
+                        Console.WriteLine("Tästä vastauksesta ei rangaista, sillä siinä on liikaa kirjaimia.\nYritä uudestaan.");
+                        Console.WriteLine("Olet yrittänyt seuraavia vääriä kirjaimia: " + Utils.tulostaVäärät(väärätVastaukset));
                         continue;
                     }
                 }
                 else
                 {
                     char arvattuKirjain = syöte[0];
-                    if (arvattavaSana.Contains(arvattuKirjain))
+                    if (!Char.IsLetter(arvattuKirjain))
                     {
                         Console.Clear();
-                        oikeatVastaukset.Add(arvattuKirjain);
-                        for (int i = 0; i < arvattavaSana.Length; i++)
+                        Console.WriteLine(arvattuKirjain + " ei ole kirjain. Käytä kirjaimia!");
+                        continue;
+                    }
+                    else if (arvattavaSana.Contains(arvattuKirjain))
+                    {
+                        Console.Clear();
+                        if (oikeatVastaukset.Contains(arvattuKirjain))
                         {
-                            if (arvattavaSana[i] == arvattuKirjain)
-                            {
-                                näytetäänPelaajalle = Utils.PaljastaOsaSana(oikeatVastaukset, arvattavaSana);
-                            }
+                            Console.Clear();
+                            Console.WriteLine("Olet jo arvannut kirjaimen " + syöte[0] + " oikein. Yritä jotain toista kirjainta! (tästä ei lähtenyt yrityskertaa)");
+                            Console.WriteLine("Olet yrittänyt seuraavia vääriä kirjaimia: " + Utils.tulostaVäärät(väärätVastaukset));
+                            continue;
                         }
-                        Console.WriteLine("Sanasta löytyy kirjain " + arvattuKirjain + ".");
-                        Console.WriteLine("Olet yrittänyt kirjaimia " + Utils.tulostaVäärät(väärätVastaukset));
-                        if (näytetäänPelaajalle == arvattavaSana)
+                        else
                         {
-                            voitto = true;
+                            oikeatVastaukset.Add(arvattuKirjain);
+                            for (int i = 0; i < arvattavaSana.Length; i++)
+                            {
+                                if (arvattavaSana[i] == arvattuKirjain)
+                                {
+                                    näytetäänPelaajalle = Utils.PaljastaOsaSana(oikeatVastaukset, arvattavaSana);
+                                }
+                            }
+                            Console.WriteLine("Sanasta löytyy kirjain " + arvattuKirjain + ".");
+                            Console.WriteLine("Olet yrittänyt kirjaimia " + Utils.tulostaVäärät(väärätVastaukset));
+                            if (näytetäänPelaajalle == arvattavaSana)
+                            {
+                                voitto = true;
+                            }
                         }
                     }
                     else if (väärätVastaukset.Contains(syöte[0]))
@@ -78,7 +149,7 @@ namespace Hirsipuu_peli
             if (voitto == true)
             {
                 Console.Clear();
-                Console.WriteLine("Voitit pelin! Onneksi olkoon! " + "Sana oli " + arvattavaSana + ".");
+                Console.WriteLine("Voitit pelin! Sana oli " + arvattavaSana + " ja sinulle jäi " + arvauskerrat + " arvauskertaa jäljelle.\nOnneksi olkoon! ");
             }
             else
             {
