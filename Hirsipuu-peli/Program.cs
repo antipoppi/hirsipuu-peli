@@ -18,7 +18,7 @@ namespace Hirsipuu_peli
             Console.WriteLine("Tervetuloa pelaamaan Hirsipuu-peliä!");
             Console.WriteLine("Voit arvata kirjaimen aakkosista A-Ö tai vastata arvattavan sanan.");
 
-            while (!voitto && arvauskerrat > 0)
+            while (!voitto && arvauskerrat > 0) // peli jatkuu niin kauan kuin voitetaan tai arvauskerrat = 0.
             {
                 Console.WriteLine("Sinulla on mahdollisuus arvata väärin " + arvauskerrat + " kertaa.");
                 Console.Write("\nArvattava sana on: " + näytetäänPelaajalle + " (sana on " + arvattavaSana.Length + " kirjainta pitkä) \nArvaa: ");
@@ -30,7 +30,7 @@ namespace Hirsipuu_peli
                 {
                     Console.WriteLine("Muisti ei riitä: " + ex.Message);
                 }
-                if (syöte.Length == arvattavaSana.Length)
+                if (syöte.Length == arvattavaSana.Length) // jos sanaa on yritetty arvata, mennään tämän ehdon sisään.
                 {
                     if (syöte == arvattavaSana)
                     {
@@ -91,7 +91,7 @@ namespace Hirsipuu_peli
                         continue;
                     }
                 }
-                else
+                else // jos yritetty arvata kirjainta, mennään tämän sisään.
                 {
                     char arvattuKirjain = syöte[0];
                     if (!Char.IsLetter(arvattuKirjain))
@@ -146,15 +146,19 @@ namespace Hirsipuu_peli
                     }
                 }
             } 
-            if (voitto == true)
+            if (voitto == true) // pelin voitto
             {
                 Console.Clear();
                 Console.WriteLine("Voitit pelin! Sana oli " + arvattavaSana + " ja sinulle jäi " + arvauskerrat + " arvauskertaa jäljelle.\nOnneksi olkoon! ");
+                Utils.TallennaTulos(voitto, "Hirsipuu-Peli", "tulokset.txt", arvauskerrat);
+                Console.WriteLine("Tulos tallennettu tulokset.txt -tiedostoon joka sijaitsee Hirsipuu-Peli -kansiossa omissa tiedostoissa.");
             }
-            else
+            else // pelin häviö
             {
                 Console.Clear();
                 Console.WriteLine("Hävisit pelin. Oikea vastaus oli: " + arvattavaSana);
+                Utils.TallennaTulos(voitto, "Hirsipuu-Peli", "tulokset.txt", arvauskerrat);
+                Console.WriteLine("Tulos tallennettu tulokset.txt -tiedostoon joka sijaitsee Hirsipuu-Peli -kansiossa omissa tiedostoissa.");
             }
         }
     }

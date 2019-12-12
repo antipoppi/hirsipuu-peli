@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Linq;
+using System.IO;
 
 namespace Hirsipuu_peli
 {
     class Utils
     {
-        // eritelty metodina erikseen helpottaakseen sanojen lisäämistä listaan
+        // Sanalista on eritelty metodina helpottaakseen sanojen lisäämistä listaan, niin halutessaan.
         public static List<string> Sanat() 
         {
             List<string> sanalista = new List<string>();
@@ -137,6 +137,99 @@ namespace Hirsipuu_peli
             {
                 Console.WriteLine("Ei voitu tulostaa väärin arvattuja kirjaimia: " + ex.Message);
                 throw ex;
+            }
+        }
+
+        // tallennetaan tulos tekstitiedostoon omiin tiedostoihin ja luodaan koko polku tarvittaessa
+        public static void TallennaTulos(bool voitto, string kansioNimi, string tiedostoNimi, int arvauskerrat)
+        {
+            try
+            {
+                string tiedostopolku = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                tiedostopolku = Path.Combine(tiedostopolku, kansioNimi);
+                if (!File.Exists(tiedostopolku + "\\" + tiedostoNimi)) // jos tiedostoa ei löydy, se luodaan ja kirjoitetaan voiton arvo.
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(tiedostopolku); // CreateDirectory luo kansion vain jos sitä ei ole.
+                        using (StreamWriter sw = File.CreateText(tiedostopolku + "\\" + tiedostoNimi))
+                        {
+                            if (voitto == true)
+                            {
+                                string päivä = DateTime.Now.ToString("HH:mm (dd.MM.yyyy)");
+                                sw.WriteLine("Voitto. klo: " + päivä + " Arvauskertoja jäi jäljelle: " + arvauskerrat);
+                            }
+                            else
+                            {
+                                string päivä = DateTime.Now.ToString("HH:mm (dd.MM.yyyy)");
+                                sw.WriteLine("Häviö. klo: " + päivä);
+                            }
+                        }
+                    }
+                    catch (IOException ex)
+                    {
+                        Console.WriteLine("Input/output virhe: " + ex.Message);
+                    }
+                    catch (UnauthorizedAccessException ex)
+                    {
+                        Console.WriteLine("Ei oikeutta kirjoittaa/lukea: " + ex.Message);
+                    }
+                    catch (NotSupportedException ex)
+                    {
+                        Console.WriteLine("Kansiota " + kansioNimi + " ei voi luoda: " + ex.Message);
+                    }
+                    catch (ArgumentOutOfRangeException ex)
+                    {
+                        Console.WriteLine("Päivämäärää ei voi muuttaa tekstiksi: " + ex.Message);
+                    }
+                    catch (FormatException ex)
+                    {
+                        Console.WriteLine("Päivämäärää ei voi muuttaa tekstiksi: " + ex.Message);
+                    }
+                }
+                else // jos tiedosto löytyy, lisätään tiedoston loppuun voiton arvo.
+                {
+                    try
+                    {
+                        using (StreamWriter sw = File.AppendText(tiedostopolku + "\\" + tiedostoNimi))
+                        {
+                            if (voitto == true)
+                            {
+                                string päivä = DateTime.Now.ToString("HH:mm (dd.MM.yyyy)");
+                                sw.WriteLine("Voitto. klo: " + päivä + " Arvauskertoja jäi jäljelle: " + arvauskerrat);
+                            }
+                            else
+                            {
+                                string päivä = DateTime.Now.ToString("HH:mm (dd.MM.yyyy)");
+                                sw.WriteLine("Häviö. klo: " + päivä);
+                            }
+                        }
+                    }
+                    catch (UnauthorizedAccessException ex)
+                    {
+                        Console.WriteLine("Ei oikeutta kirjoittaa/lukea: " + ex.Message);
+                    }
+                    catch (NotSupportedException ex)
+                    {
+                        Console.WriteLine("StreamWriter ei pysty lisäämään tekstiä tiedostoon " + tiedostoNimi + ": " + ex.Message);
+                    }
+                    catch (DirectoryNotFoundException ex)
+                    {
+                        Console.WriteLine("Kansiota " + kansioNimi + " ei löydy: " + ex.Message);
+                    }
+                    catch (FormatException ex)
+                    {
+                        Console.WriteLine("Päivämäärää ei voi muuttaa tekstiksi: " + ex.Message);
+                    }
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine("Tulosta ei voi tallentaa: " + ex.Message);
+            }
+            catch (PlatformNotSupportedException ex)
+            {
+                Console.WriteLine("Tulosta ei voi tallentaa, koska järjestelmää ei tueta: " + ex.Message);
             }
         }
     }
