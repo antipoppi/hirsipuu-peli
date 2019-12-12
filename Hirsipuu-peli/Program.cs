@@ -30,6 +30,10 @@ namespace Hirsipuu_peli
                 {
                     Console.WriteLine("Muisti ei riitä: " + ex.Message);
                 }
+                catch (ArgumentOutOfRangeException ex)
+                {
+                    Console.WriteLine("Syötettä ei voi lukea: " + ex.Message);
+                }
                 if (syöte.Length == arvattavaSana.Length) // jos sanaa on yritetty arvata, mennään tämän ehdon sisään.
                 {
                     if (syöte == arvattavaSana)
